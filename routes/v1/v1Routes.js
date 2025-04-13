@@ -15,14 +15,12 @@ router
 		.get(searchController.fetchDocById.bind(searchController))
 
 router
+  .route('/search/id/:id/tags')
+    .post(tagsController.addTags.bind(tagsController))
+    .delete(tagsController.deleteTag.bind(tagsController))
+
+router
   .route('/tags')
     .get(tagsController.getTagsByDocId.bind(tagsController))
-
-// router
-//   .route('/tags/:tag')
-//     .get(searchController.fetchDocsByTag.bind(searchController))
-//     .post(searchController.addTag.bind(searchController)) 
-//     .delete(searchController.deleteTag.bind(searchController)) 
-    // .put(searchController.updateTag.bind(searchController))
 
 export default router

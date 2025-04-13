@@ -8,7 +8,7 @@ function initMiddleware(app) {
   app.use(morgan('dev'))
   app.use(bodyParser.json())
   app.use(bodyParser.urlencoded({ extended: false }))
-  app.use(cors())
+  app.use(cors({ origin: '*' }))
 }
 
 export { initMiddleware }
