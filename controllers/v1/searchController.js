@@ -16,7 +16,7 @@ class SearchController {
   async fetchDocs(req, res) {
     const { query } = req.params;
     const limit = req.query.limit || 10;
-    const offset = req.query.offset || 0;
+    const start = req.query.start || 0;
 
     if (!query) {
       return res.status(400).json({
@@ -25,28 +25,54 @@ class SearchController {
     }
 
     const params = new URLSearchParams({
-        cql: `title~"*${query}*" AND space=${CONFLUENCE_SPACE_KEY}`,
+        cql: `title~"*${query}*" AND space=${CONFLUENCE_SPACE_KEY} AND type=page`,
         limit,
-        offset,
+        start,
         expand: "content.version,content.history,content.metadata.labels",
     });
 
+    const apiUrl = `/wiki/rest/api/search?${params}`;
+
+
     const response = await fetch(
-      `${CONFLUENCE_BASE_URL}/wiki/rest/api/search?${params}`,
+      `${CONFLUENCE_BASE_URL}${apiUrl}`,
       { headers: this.#headers }
     );
 
     let data = await response.json()
 
-    if (data.results.length === 0) {
-      return res.status(204).json({
-        message: "No results found",
+    return res.status(200).json({
+      data: data
+    });
+  }
+
+  async fetchNextDocs(req, res) {
+    const { nextlink } = req.query;
+    
+    if (!nextlink) {
+      return res.status(400).json({
+        message: "Link is required",
+      });
+    }
+
+    const decodedLink = decodeURIComponent(nextlink).split('?')[1];
+
+    const response = await fetch(
+      `${CONFLUENCE_BASE_URL}/wiki/rest/api/search?${decodedLink}`,
+      { headers: this.#headers }
+    );
+
+    let data = await response.json();
+
+    if (response.status !== 200) {
+      return res.status(response.status).json({
+        message: "Error fetching data",
         data: []
       });
     }
 
     return res.status(200).json({
-      data: data.results
+      data: data
     });
   }
 
@@ -64,7 +90,6 @@ class SearchController {
       { headers: this.#headers }
     );
 
-    console.log("Status code:", response.status)
     let data = await response.json();
 
     if (!data || !data.version || data.status === 'error') {

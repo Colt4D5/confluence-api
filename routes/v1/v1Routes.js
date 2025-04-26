@@ -7,6 +7,10 @@ import tagsController from '../../controllers/v1/tagsController.js'
 
 // routes
 router
+  .route('/search/next')
+    .get(searchController.fetchNextDocs.bind(searchController))
+
+router
   .route('/search/:query')
     .get(searchController.fetchDocs.bind(searchController))
 

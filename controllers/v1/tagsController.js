@@ -33,7 +33,6 @@ class TagsController {
     );
 
     let data = await response.json();
-    // console.log(data);
 
     if (!data.metadata || !data.metadata.labels) {
       return res.status(204).json({
@@ -101,7 +100,6 @@ class TagsController {
     );
 
     let updateData = await updateResponse.json();
-    console.log(updateData);
 
     return res.status(200).json({
       tags,
@@ -111,9 +109,7 @@ class TagsController {
 
   async deleteTag(req, res) {
     const { id } = req.params;
-    const { tag } = req.query;
-
-    console.log(id, tag);
+    const { tag } = req.body;
 
     if (!id) {
       return res.status(400).json({
